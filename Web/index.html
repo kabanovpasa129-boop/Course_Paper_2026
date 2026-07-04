@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Рекламное агентство | CREATIVE HUB</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Хедер с навигацией -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">✦</span>
+                <span class="logo-text">CREATIVE HUB</span>
+            </div>
+            <nav class="nav">
+                <a href="#home" class="nav-link">Главная</a>
+                <a href="#portfolio" class="nav-link">Портфолио</a>
+                <a href="#contact" class="nav-link">Контакты</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Секция 1: Приветствие и о компании -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Вдохновляем <span class="accent">бизнес</span><br>на новые высоты</h1>
+                    <p class="hero-description">CREATIVE HUB — рекламное агентство полного цикла. Мы создаём рекламу, которая работает на результат. Дизайн, наружка, интернет-продвижение — всё в одном месте.</p>
+                    <button class="btn btn-primary" id="scrollToFormBtn">Оставить заявку</button>
+                </div>
+                <div class="hero-image">
+                    <img src="logobig.png" alt="Рекламное агентство">
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция 2: Портфолио -->
+        <section id="portfolio" class="portfolio">
+            <div class="container">
+                <h2 class="section-title">Наши работы</h2>
+                <p class="section-subtitle">Реальные проекты, которыми мы гордимся</p>
+                <div class="portfolio-grid" id="portfolioGrid">
+                    <!-- Портфолио загружается через JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция 3: Кнопка с анкетой (форма) -->
+        <section id="form" class="form-section">
+            <div class="container">
+                <div class="form-card">
+                    <h2 class="form-title">Заполните анкету</h2>
+                    <p class="form-subtitle">Расскажите о вашем проекте, и мы свяжемся с вами в течение часа</p>
+                    <form id="applicationForm" class="application-form">
+                        <div class="form-group">
+                            <input type="text" id="projectName" placeholder="Название дела / проекта" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="fullName" placeholder="Ваше ФИО" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="tel" id="phone" placeholder="Телефон" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="preferences" rows="4" placeholder="Ваши предпочтения, идеи или техническое задание"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-submit">Отправить заявку</button>
+                        <p class="form-note" id="formMessage"></p>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Секция 4: Контактная и юридическая информация -->
+        <footer id="contact" class="footer">
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-col">
+                        <h3 class="footer-logo">CREATIVE HUB</h3>
+                        <p>Современное рекламное агентство полного цикла. Работаем с 2015 года.</p>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Контакты</h4>
+                        <p>📞 <a href="tel:+78005553535">+7 (800) 555-35-35</a></p>
+                        <p>✉️ <a href="mailto:info@creativehub.ru">info@creativehub.ru</a></p>
+                        <p>📍 г. Краснодар, ул. Красная, 100</p>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Юридическая информация</h4>
+                        <p>ООО «КРЕАТИВ ХАБ»</p>
+                        <p>ИНН 2312345678</p>
+                        <p>ОГРН 1152300012345</p>
+                        <p>Политика конфиденциальности</p>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>© 2025 CREATIVE HUB. Все права защищены.</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

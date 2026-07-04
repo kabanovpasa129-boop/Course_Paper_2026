@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ-панель | CREATIVE HUB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a1a;
+            font-family: 'Segoe UI', system-ui;
+            padding: 40px;
+            color: white;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 40px;
+        }
+        .logout-btn, .refresh-btn {
+            background: #2a2a4a;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 24px;
+            color: white;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .logout-btn:hover, .refresh-btn:hover {
+            background: #ff6b4a;
+        }
+        .card {
+            background: #1a1a2e;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        th {
+            background: rgba(255,255,255,0.05);
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .status-Новая { background: #ff6b4a; }
+        .status-В_обработке { background: #2a6b3f; }
+        .status-Завершена { background: #2a2a4a; }
+        select, button {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: #1a1a2e;
+            padding: 40px;
+            border-radius: 24px;
+        }
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: #2a2a4a;
+            border: 1px solid #3a3a5a;
+            border-radius: 8px;
+            color: white;
+        }
+        .error {
+            color: #ff6b4a;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app"></div>
+
+    <script>
+        // API URL (поменяйте порт на ваш)
+        var API_URL = 'https://localhost:7001/api';
+
+        function showLogin() {
+            document.getElementById('app').innerHTML = `
+                <div class="login-container">
+                    <h2>Вход в админ-панель</h2>
+                    <input type="text" id="login" placeholder="Логин">
+                    <input type="password" id="password" placeholder="Пароль">
+                    <button onclick="login()">Войти</button>
+                    <div id="errorMsg" class="error"></div>
+                </div>
+            `;
+        }
+
+        function login() {
+            var login = document.getElementById('login').value;
+            var password = document.getElementById('password').value;
+
+            fetch(API_URL + '/Auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Логин: login, Пароль: password })
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error('Неверный логин или пароль');
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                localStorage.setItem('adminUser', JSON.stringify({ login: data.login, role: data.role, name: data.name }));
+                loadAdminPanel();
+            })
+            .catch(function(error) {
+                document.getElementById('errorMsg').innerText = error.message;
+            });
+        }
+
+        function loadAdminPanel() {
+            var user = JSON.parse(localStorage.getItem('adminUser'));
+            if (!user) {
+                showLogin();
+                return;
+            }
+
+            var html = `
+                <div class="container">
+                    <div class="header">
+                        <h1>Админ-панель CREATIVE HUB</h1>
+                        <div>
+                            <button class="refresh-btn" onclick="loadOrders()">Обновить</button>
+                            <button class="logout-btn" onclick="logout()">Выйти</button>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <p>Вы вошли как: <strong>${user.name}</strong> (${user.role})</p>
+                    </div>
+                    <div class="card">
+                        <h2>Заявки клиентов</h2>
+                        <table id="ordersTable">
+                            <tr><th>ID</th><th>ФИО</th><th>Телефон</th><th>Комментарий</th><th>Дата</th><th>Статус</th><th>Действие</th></tr>
+                            <tr><td colspan="7">Загрузка...</td></tr>
+                        </table>
+                    </div>
+                </div>
+            `;
+            document.getElementById('app').innerHTML = html;
+            loadOrders();
+        }
+
+        function loadOrders() {
+            fetch(API_URL + '/Заявка')
+                .then(function(response) { return response.json(); })
+                .then(function(orders) {
+                    var table = document.getElementById('ordersTable');
+                    if (!orders || orders.length === 0) {
+                        table.innerHTML = '<tr><td colspan="7">Нет заявок</td></tr>';
+                        return;
+                    }
+
+                    var html = '<tr><th>ID</th><th>ФИО</th><th>Телефон</th><th>Комментарий</th><th>Дата</th><th>Статус</th><th>Действие</th></tr>';
+                    for (var i = 0; i < orders.length; i++) {
+                        var o = orders[i];
+                        html += `
+                            <tr>
+                                <td>${o.id}</td>
+                                <td>${o.фамилия} ${o.имя} ${o.отчество}</td>
+                                <td>${o.телефон}</td>
+                                <td>${o.комментарий || ''}</td>
+                                <td>${o.дата_создания}</td>
+                                <td>
+                                    <select class="status-select" data-id="${o.id}" onchange="updateStatus(${o.id}, this.value)">
+                                        <option value="Новая" ${o.статус === 'Новая' ? 'selected' : ''}>Новая</option>
+                                        <option value="В обработке" ${o.статус === 'В обработке' ? 'selected' : ''}>В обработке</option>
+                                        <option value="Завершена" ${o.статус === 'Завершена' ? 'selected' : ''}>Завершена</option>
+                                    </select>
+                                </td>
+                                <td><button onclick="deleteOrder(${o.id})">Удалить</button></td>
+                            </tr>
+                        `;
+                    }
+                    table.innerHTML = html;
+                })
+                .catch(function(error) {
+                    console.error('Ошибка загрузки заявок:', error);
+                    document.getElementById('ordersTable').innerHTML = '<tr><td colspan="7">Ошибка загрузки</td></tr>';
+                });
+        }
+
+        function updateStatus(id, newStatus) {
+            fetch(API_URL + '/Заявка/' + id + '/status', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ статус: newStatus })
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    loadOrders();
+                }
+            });
+        }
+
+        function deleteOrder(id) {
+            if (confirm('Удалить заявку?')) {
+                fetch(API_URL + '/Заявка/' + id, {
+                    method: 'DELETE'
+                })
+                .then(function(response) {
+                    if (response.ok) {
+                        loadOrders();
+                    }
+                });
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminUser');
+            showLogin();
+        }
+
+        // Запуск
+        var user = localStorage.getItem('adminUser');
+        if (user) {
+            loadAdminPanel();
+        } else {
+            showLogin();
+        }
+    </script>
+</body>
+</html>

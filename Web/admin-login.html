@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход в админ-панель | CREATIVE HUB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0a0a1a;
+            font-family: 'Segoe UI', system-ui;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background: #1a1a2e;
+            padding: 48px;
+            border-radius: 32px;
+            width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .login-container h1 {
+            color: white;
+            font-size: 28px;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+        .login-container p {
+            color: rgba(255,255,255,0.6);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        input {
+            width: 100%;
+            padding: 14px 18px;
+            margin-bottom: 16px;
+            background: #2a2a4a;
+            border: 1px solid #3a3a5a;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #ff6b4a;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ff6b4a, #ff3a6f);
+            color: white;
+            border: none;
+            border-radius: 40px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .error {
+            color: #ff6b4a;
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>CREATIVE HUB</h1>
+        <p>Вход в админ-панель</p>
+        <input type="text" id="login" placeholder="Логин">
+        <input type="password" id="password" placeholder="Пароль">
+        <button onclick="doLogin()">Войти</button>
+        <div id="errorMsg" class="error"></div>
+    </div>
+
+    <script>
+        var API_URL = 'http://localhost:5000/api';
+
+        function doLogin() {
+            var login = document.getElementById('login').value;
+            var password = document.getElementById('password').value;
+            var errorMsg = document.getElementById('errorMsg');
+
+            if (!login || !password) {
+                errorMsg.innerText = 'Заполните логин и пароль';
+                return;
+            }
+
+            errorMsg.innerText = 'Проверка...';
+            errorMsg.style.color = 'white';
+
+            fetch(API_URL + '/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ Логин: login, Пароль: password })
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    return response.json().then(function(data) {
+                        throw new Error(data.message || 'Неверный логин или пароль');
+                    });
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                localStorage.setItem('adminUser', JSON.stringify({
+                    login: data.login,
+                    role: data.role,
+                    name: data.name
+                }));
+                window.location.href = 'admin-panel.html';
+            })
+            .catch(function(error) {
+                errorMsg.innerText = error.message;
+                errorMsg.style.color = '#ff6b4a';
+            });
+        }
+    </script>
+</body>
+</html>
